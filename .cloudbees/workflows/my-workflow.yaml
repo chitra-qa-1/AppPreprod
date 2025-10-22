@@ -9,7 +9,7 @@ on:
 permissions:
   scm-token-own: read
   scm-token-org: read
-  id-token: write
+  id-token: write 
 jobs:
   build:
     steps:
@@ -18,15 +18,20 @@ jobs:
       - id: build-container
         name: Build container image
         uses: docker://gcr.io/kaniko-project/executor:debug
-        run: |
-          /kaniko/executor --context $CLOUDBEES_WORKSPACE --build-arg USER=cbp-qa-automation,TOKEN=${{ secrets.GH_SECURITY_PAT }} --dockerfile $CLOUDBEES_WORKSPACE/Dockerfile --tar-path $CLOUDBEES_WORKSPACE/container-image.tar --no-push
+        run: | 
+          /kaniko/executor --context $CLOUDBEES_WORKSPACE --build-arg USER=cbp,TOKEN=${{ secrets.GH_SECURITY_PAT }} --dockerfile $CLOUDBEES_WORKSPACE/Dockerfile --tar-path $CLOUDBEES_WORKSPACE/container-image.tar --no-push
       - id: register-artifact
         name: Register the artifact
         uses: cloudbees-io/register-build-artifact@v1
         with:
-          name: vulnerableRepoPROD
-          version: QE-0.1
-          url: 020229604682.dkr.ecr.us-east-1.amazonaws.com/throwaway/actions/vulnerable-image:QE-0.1
+          name: new-findsecbug
+          version: CP-2908
+          url: 020229604682.dkr.ecr.us-east-1.amazonaws.com/throwaway/actions/findsecbug:CP-2908
+      - name: Print output parameter artifact ID
+        uses: docker://alpine:latest
+        shell: sh
+        run: |
+           echo "artifact ID for new-findsecbug:${{ cloudbees.version }} is: ${{ steps.register-artifact.outputs.artifact-id }}"
       - id: upload-binary
         name: Upload binary using action
         uses: cloudbees-io/asset-chain-utils-preprod/upload-binary@v1
@@ -34,4 +39,7 @@ jobs:
           file-path: container-image.tar
           file-type: BINARY_CONTAINER
           debug: "true"
-          alias: 020229604682.dkr.ecr.us-east-1.amazonaws.com/throwaway/actions/vulnerable-image:QE-0.1
+          alias: 020229604682.dkr.ecr.us-east-1.amazonaws.com/throwaway/actions/new-findsecbug:CP-2908
+   
+     
+      
