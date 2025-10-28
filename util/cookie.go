@@ -35,7 +35,7 @@ func SetCookie(w http.ResponseWriter, name, value string){
 		Name: name, 
 		Value: value,
 	}
-	http.SetCookie(w, &cookie)
+	
 }
 
 func GetCookie(r *http.Request, name string)string{
